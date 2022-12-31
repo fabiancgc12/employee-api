@@ -7,7 +7,9 @@
 import app from '../app.js';
 import debugLibrary from 'debug'
 import http from 'http';
+import dotenv from "dotenv"
 
+dotenv.config()
 const debug = debugLibrary('employeeapi:server')
 
 /**
@@ -89,6 +91,6 @@ function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
-    : 'port ' + addr.port;
+    : 'port ' + addr?.port;
   debug('Listening on ' + bind);
 }
