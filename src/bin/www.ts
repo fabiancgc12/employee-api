@@ -5,7 +5,6 @@
  */
 
 import app from '../app.js';
-// var debug = require('debug')('employeeapi:server');
 import debugLibrary from 'debug'
 import http from 'http';
 
