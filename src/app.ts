@@ -3,8 +3,8 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import sassMiddleware from 'node-sass-middleware';
-import {HomeController} from './controllers/HomeController.js';
-import {UserController} from './controllers/UserController.js';
+import {HomeController} from './Home/index.js';
+import {UserController} from './Users/index.js';
 import {fileURLToPath} from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,11 +23,10 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const controllers = [HomeController,UserController];
+const controllers = [new HomeController(),new UserController()];
 
-controllers.forEach(Controller => {
-  const con = new Controller();
-  app.use(con.baseRoute, con.router);
+controllers.forEach(controller => {
+  app.use("/", controller.router);
 })
 
 export default app;

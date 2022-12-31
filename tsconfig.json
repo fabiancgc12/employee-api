@@ -12,7 +12,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*.ts"],
+  "exclude": ["node_modules"],
   "ts-node": {
     "esm": true
   }

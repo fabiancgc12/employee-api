@@ -2,9 +2,9 @@ import express, {RequestHandler, Router} from 'express';
 import {BaseController} from "../common/controller/BaseController.js";
 const router = express.Router();
 
-export class UserController  extends BaseController{
-  readonly baseRoute = "/users";
-  readonly router: Router;
+export class HomeController extends BaseController{
+  readonly router: express.Router;
+  readonly baseRoute = "/";
 
   constructor() {
     super()
@@ -13,10 +13,10 @@ export class UserController  extends BaseController{
   }
 
   private initializeRoutes = () => {
-    this.router.get("/",this.get)
+    this.router.get(this.baseRoute,this.get)
   }
 
   get:RequestHandler = (req,res,next) => {
-    res.send('respond with a resource');
+    res.render('index', { title: 'Express' });
   }
 }
