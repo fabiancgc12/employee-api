@@ -6,7 +6,8 @@
   "scripts": {
     "clean": "npx rimraf ./dist/",
     "prebuild": "npm run clean",
-    "start": "node dist/bin/www",
+    "start": "ts-node --esm bin/www.ts",
+    "start:prod": "node dist/bin/www",
     "postbuild": "yarn run copyPublic",
     "copyPublic": "copyfiles --error --up 1 public/**/* dist/public",
     "build": "tsc"
