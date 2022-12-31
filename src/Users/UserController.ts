@@ -1,6 +1,5 @@
-import express, {RequestHandler, Router} from 'express';
+import {RequestHandler, Router} from 'express';
 import {BaseController} from "../common/controller/BaseController.js";
-const router = express.Router();
 
 export class UserController  extends BaseController{
   readonly baseRoute = "/users";
@@ -16,7 +15,7 @@ export class UserController  extends BaseController{
     this.router.get(this.baseRoute,this.get)
   }
 
-  get:RequestHandler = (req,res,next) => {
+  get:RequestHandler = async (req,res,next) => {
     res.send('respond with a resource');
   }
 }

@@ -6,6 +6,7 @@ import sassMiddleware from 'node-sass-middleware';
 import {HomeController} from './Home/index.js';
 import {UserController} from './Users/index.js';
 import {fileURLToPath} from "url";
+import {errorMiddleware} from "./common/middlewares/errorMiddleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,5 +29,7 @@ const controllers = [new HomeController(),new UserController()];
 controllers.forEach(controller => {
   app.use("/", controller.router);
 })
+
+app.use(errorMiddleware);
 
 export default app;
