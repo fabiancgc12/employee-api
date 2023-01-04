@@ -1,5 +1,5 @@
 export class EmployeeModel {
-    id:number;
+    id:string;
     firstName:string;
     lastName:string;
     email:string;
@@ -7,7 +7,7 @@ export class EmployeeModel {
     createdAt:string;
     updatedAt:string;
 
-    constructor(id: number, firstName: string, lastName: string, email: string, dateOfBirth: string, createdAt: string, updatedAt: string) {
+    constructor(id: string, firstName: string, lastName: string, email: string, dateOfBirth: string, createdAt: string, updatedAt: string) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

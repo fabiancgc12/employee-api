@@ -3,6 +3,7 @@ import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {faker} from "@faker-js/faker";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
+import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 
 
 function mockCreateEmployeeDto(
@@ -15,7 +16,7 @@ function mockCreateEmployeeDto(
         options.dateOfBirth ?? faker.date.birthdate()
 )}
 
-describe("Employee controller",() => {
+describe("Employee Service",() => {
     let service:EmployeeService;
     beforeAll(async () => {
         await pgClient.connect()
@@ -27,7 +28,7 @@ describe("Employee controller",() => {
     it('should create one employee', async function () {
         const dto = mockCreateEmployeeDto()
         expect(await service.createOne(dto)).toMatchObject({
-            id:expect.any(Number),
+            id:expect.any(String),
             firstName:dto.firstName,
             lastName:dto.lastName,
             email:dto.email,
@@ -44,7 +45,16 @@ describe("Employee controller",() => {
             email:firstEmployeeDto.email
         });
         await expect(service.createOne(secondEmployeeDto)).rejects.toThrow(UniqueConstraintException)
-
     });
 
+    it('should get one employee', async function () {
+        const dto = mockCreateEmployeeDto();
+        const employee = await service.createOne(dto)
+        await expect(service.getOneById(employee.id)).resolves.toEqual(employee)
+    });
+
+    it('should throw error when employee id does not exist', async function () {
+        await expect(service.getOneById('1000000000')).rejects.toThrow(ResourceNotFoundException)
+
+    });
 })
