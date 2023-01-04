@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import sassMiddleware from 'node-sass-middleware';
 import {HomeController} from './Home/index.js';
-import {UserController} from './Users/index.js';
+import {EmployeeController} from './Employee/index.js';
 import {fileURLToPath} from "url";
 import {errorMiddleware} from "./common/middlewares/errorMiddleware.js";
 
@@ -24,7 +24,7 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const controllers = [new HomeController(),new UserController()];
+const controllers = [new HomeController(),new EmployeeController()];
 
 controllers.forEach(controller => {
   app.use("/", controller.router);

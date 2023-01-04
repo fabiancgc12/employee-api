@@ -13,6 +13,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "class-validator": "^0.14.0",
     "cookie-parser": "~1.4.4",
     "debug": ">2.6.9",
     "dotenv": "^16.0.3",
