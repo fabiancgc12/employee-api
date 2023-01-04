@@ -2,6 +2,7 @@ import {EmployeeService} from "./EmployeeService.js";
 import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {faker} from "@faker-js/faker";
+import {UniqueConstraintException} from "../common/errors/UniqueConstraintException.js";
 
 
 function mockCreateEmployeeDto(
@@ -23,10 +24,6 @@ describe("Employee controller",() => {
         service = new EmployeeService();
     })
 
-    afterAll(async () => {
-        // await pgClient.end()
-    })
-
     it('should create one employee', async function () {
         const dto = mockCreateEmployeeDto()
         expect(await service.createOne(dto)).toMatchObject({
@@ -39,4 +36,15 @@ describe("Employee controller",() => {
             updatedAt:expect.any(Date)
         })
     });
+
+    it('should throw error when creating employee with repeated email', async function () {
+        const firstEmployeeDto = mockCreateEmployeeDto();
+        await service.createOne(firstEmployeeDto)
+        const secondEmployeeDto = mockCreateEmployeeDto({
+            email:firstEmployeeDto.email
+        });
+        await expect(service.createOne(secondEmployeeDto)).rejects.toThrow(UniqueConstraintException)
+
+    });
+
 })

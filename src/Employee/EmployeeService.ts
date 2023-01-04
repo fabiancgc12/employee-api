@@ -1,6 +1,10 @@
 import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
 import {pgClient} from "../common/database/pgClient.js";
+import {PostgresErrorCodes} from "../common/database/PostgresErrorCodes.js";
+import {UniqueConstraintException} from "../common/errors/UniqueConstraintException.js";
+import {ServerException} from "../common/errors/ServerException.js";
+import {DatabaseError} from "pg";
 
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
@@ -10,7 +14,7 @@ export class EmployeeService {
                 'INSERT INTO "Employee" ("firstName","lastName","email","dateOfBirth","updatedAt") VALUES ($1,$2,$3,$4,$5) RETURNING *',
                 values)
             const data = result.rows[0]
-            const employee = new EmployeeModel(
+            return new EmployeeModel(
                 data.id,
                 data.firstName,
                 data.lastName,
@@ -19,10 +23,12 @@ export class EmployeeService {
                 data.createdAt,
                 data.updatedAt
             )
-            return employee
         }
         catch (e) {
-            throw e
+            if (e instanceof DatabaseError && e.code == PostgresErrorCodes.DuplicatePrimaryKey){
+                throw new UniqueConstraintException("email")
+            }
+            throw new ServerException()
         }
     }
 }
