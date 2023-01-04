@@ -7,16 +7,16 @@
 import app from '../app.js';
 import debugLibrary from 'debug'
 import http from 'http';
-import dotenv from "dotenv"
+import {configVariables} from "../common/config/configVariables.js";
+import {pgClient} from "../common/database/pgClient.js";
 
-dotenv.config()
 const debug = debugLibrary('employeeapi:server')
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '3001');
+const port = normalizePort(configVariables.SERVER_PORT || '3001');
 app.set('port', port);
 
 /**
@@ -29,8 +29,14 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port, () => {
-  console.log(`server started on port: ${port}`)
+server.listen(port, async () => {
+  try {
+    await pgClient.connect()
+    console.log("connected to database")
+    console.log(`server started on port: ${port}`)
+  } catch (e) {
+    console.error(e)
+  }
 });
 server.on('error', onError);
 server.on('listening', onListening);

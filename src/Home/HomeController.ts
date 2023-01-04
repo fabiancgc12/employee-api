@@ -1,9 +1,8 @@
-import express, {RequestHandler, Router} from 'express';
+import {RequestHandler, Router} from 'express';
 import {BaseController} from "../common/controller/BaseController.js";
-const router = express.Router();
 
 export class HomeController extends BaseController{
-  readonly router: express.Router;
+  readonly router: Router;
   readonly baseRoute = "/";
 
   constructor() {
