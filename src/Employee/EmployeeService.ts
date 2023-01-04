@@ -2,8 +2,8 @@ import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {PostgresErrorCodes} from "../common/database/PostgresErrorCodes.js";
-import {UniqueConstraintException} from "../common/errors/UniqueConstraintException.js";
-import {ServerException} from "../common/errors/ServerException.js";
+import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
+import {ServerException} from "../common/exceptions/ServerException.js";
 import {DatabaseError} from "pg";
 
 export class EmployeeService {

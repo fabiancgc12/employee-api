@@ -2,7 +2,7 @@ import {EmployeeService} from "./EmployeeService.js";
 import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {faker} from "@faker-js/faker";
-import {UniqueConstraintException} from "../common/errors/UniqueConstraintException.js";
+import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 
 
 function mockCreateEmployeeDto(
