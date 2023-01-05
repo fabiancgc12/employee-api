@@ -7,5 +7,7 @@ export class UpdateEmployeeDto {
 
     role?:string;
 
+    boss?:string;
+
     dateOfBirth?:Date;
 }

@@ -15,6 +15,7 @@ function mockCreateEmployeeDto(
         options.lastName ?? faker.name.lastName(),
             options.email ?? faker.internet.email(),
         options.role ?? faker.name.jobTitle(),
+        options.boss ?? undefined,
         options.dateOfBirth ?? faker.date.birthdate()
 )}
 
@@ -30,13 +31,32 @@ describe("Employee Service",() => {
         await pgClient.end()
     })
 
-    it('should create one employee', async function () {
+    it('should create one employee without boss', async function () {
         const dto = mockCreateEmployeeDto()
         expect(await service.createOne(dto)).toMatchObject({
             id:expect.any(String),
             firstName:dto.firstName,
             lastName:dto.lastName,
             email:dto.email,
+            boss:undefined,
+            dateOfBirth:dto.dateOfBirth,
+            createdAt:expect.any(Date),
+            updatedAt:expect.any(Date)
+        })
+    });
+
+    it('should create one employee with a boss', async function () {
+        let dto = mockCreateEmployeeDto();
+        const boss = await service.createOne(dto)
+        dto = mockCreateEmployeeDto({
+            boss:boss.id
+        });
+        expect(await service.createOne(dto)).toMatchObject({
+            id:expect.any(String),
+            firstName:dto.firstName,
+            lastName:dto.lastName,
+            email:dto.email,
+            boss:dto.boss,
             dateOfBirth:dto.dateOfBirth,
             createdAt:expect.any(Date),
             updatedAt:expect.any(Date)
@@ -107,7 +127,25 @@ describe("Employee Service",() => {
         await expect(service.findOneById(employee.id)).resolves.toMatchObject(patchedEmployee)
     });
 
-    it('should shpuld throw error on update if employee does not exist', async function () {
+    it('should update one employee boss', async function () {
+        const createDto = mockCreateEmployeeDto();
+        const boss = await service.createOne(mockCreateEmployeeDto());
+        let employee = await service.createOne(createDto);
+        expect(employee.boss).toBe(undefined)
+        let updateDto:UpdateEmployeeDto = {
+            boss:boss.id
+        }
+        employee = await service.updateOne(employee.id,updateDto)
+        expect(employee.boss).toBe(boss.id)
+        const newBoss = await service.createOne(mockCreateEmployeeDto())
+        updateDto = {
+            boss:newBoss.id
+        }
+        employee = await service.updateOne(employee.id,updateDto)
+        expect(employee.boss).toBe(newBoss.id)
+    });
+
+    it('should should throw error on update if employee does not exist', async function () {
         const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
         await expect(service.updateOne("100000000",updateDto)).rejects.toThrow(ResourceNotFoundException)
 
