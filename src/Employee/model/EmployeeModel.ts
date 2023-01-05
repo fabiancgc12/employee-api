@@ -3,11 +3,11 @@ export class EmployeeModel {
     firstName:string;
     lastName:string;
     email:string;
-    dateOfBirth:string;
-    createdAt:string;
-    updatedAt:string;
+    dateOfBirth:Date;
+    createdAt:Date;
+    updatedAt:Date;
 
-    constructor(id: string, firstName: string, lastName: string, email: string, dateOfBirth: string, createdAt: string, updatedAt: string) {
+    constructor(id: string, firstName: string, lastName: string, email: string, dateOfBirth: Date, createdAt: Date, updatedAt: Date) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

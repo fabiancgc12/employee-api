@@ -7,6 +7,7 @@ import {DatabaseError} from "pg";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {ServerException} from "../common/exceptions/ServerException.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
+import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
@@ -53,6 +54,29 @@ export class EmployeeService {
                 [limit,offset])
             return result.rows;
         }catch (e) {
+            throw new ServerException()
+        }
+    }
+
+    async updateOne(id:string,dto:UpdateEmployeeDto):Promise<EmployeeModel>{
+        try {
+            const employee = await this.findOneById(id);
+            dto.firstName = dto.firstName ?? employee.firstName;
+            dto.lastName = dto.lastName ?? employee.lastName;
+            dto.email = dto.email ?? employee.email;
+            dto.dateOfBirth = dto.dateOfBirth ?? employee.dateOfBirth;
+            const result = await pgClient.query(
+                `UPDATE "Employee" SET "firstName" = $2, "lastName" = $3, 
+                      "email" = $4, "dateOfBirth" = $5, "updatedAt" = $6
+                      WHERE id = $1
+                      RETURNING *`,
+                [id,dto.firstName,dto.lastName,dto.email,dto.dateOfBirth, new Date()]
+            )
+            const data = result.rows[0]
+            return this.dataToEmployeeModel(data);
+        } catch (e) {
+            if (e instanceof ResourceNotFoundException)
+                throw e
             throw new ServerException()
         }
     }

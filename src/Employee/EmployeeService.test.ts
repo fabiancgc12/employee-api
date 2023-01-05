@@ -5,6 +5,7 @@ import {faker} from "@faker-js/faker";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
+import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 
 
 function mockCreateEmployeeDto(
@@ -77,6 +78,36 @@ describe("Employee Service",() => {
         const page = 1;
         const employeesDesc = await service.findAll(limit,page,DatabaseOrder.DESC)
         expect(employeesDesc).toHaveLength(10)
+    });
+
+    it('should update one employee firstname', async function () {
+        const createDto = mockCreateEmployeeDto();
+        const employee = await service.createOne(createDto);
+        const updateDto:UpdateEmployeeDto = {
+            firstName: "dave"
+        }
+        //we are ignoring the updateat property because it will always be diferent
+        const {updatedAt,...rest} = employee
+        const patchedEmployee = {...rest,...updateDto}
+        await expect(service.updateOne(employee.id,updateDto)).resolves.toMatchObject(patchedEmployee)
+        await expect(service.findOneById(employee.id)).resolves.toMatchObject(patchedEmployee)
+    });
+
+    it('should update one employee whole data', async function () {
+        const createDto = mockCreateEmployeeDto();
+        const employee = await service.createOne(createDto);
+        const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
+        //we are ignoring the updateat property because it will always be different
+        const {updatedAt,...rest} = employee
+        const patchedEmployee = {...rest,...updateDto}
+        await expect(service.updateOne(employee.id,updateDto)).resolves.toMatchObject(patchedEmployee)
+        await expect(service.findOneById(employee.id)).resolves.toMatchObject(patchedEmployee)
+    });
+
+    it('should shpuld throw error on update if employee does not exist', async function () {
+        const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
+        await expect(service.updateOne("100000000",updateDto)).rejects.toThrow(ResourceNotFoundException)
+
     });
 
     it('should delete one employee',async function () {
