@@ -6,6 +6,7 @@ import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintEx
 import {DatabaseError} from "pg";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {ServerException} from "../common/exceptions/ServerException.js";
+import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
@@ -43,11 +44,12 @@ export class EmployeeService {
         }
     }
 
-    async findAll(limit:number,page:number){
+    async findAll(limit:number,page:number,order = DatabaseOrder.ASC){
         try {
+            let queryOrder = order == DatabaseOrder.DESC ? DatabaseOrder.DESC : ""
             const offset = (page - 1)*limit
             const result = await pgClient.query(
-                'SELECT * FROM "Employee" LIMIT $1 OFFSET $2',
+                `SELECT * FROM "Employee" ORDER BY id ${queryOrder} LIMIT $1 OFFSET $2`,
                 [limit,offset])
             return result.rows;
         }catch (e) {

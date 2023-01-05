@@ -4,6 +4,7 @@ import {pgClient} from "../common/database/pgClient.js";
 import {faker} from "@faker-js/faker";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
+import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 
 
 function mockCreateEmployeeDto(
@@ -69,6 +70,13 @@ describe("Employee Service",() => {
         const page = 10000000;
         const employees = await service.findAll(limit,page)
         expect(employees).toHaveLength(0)
+    });
+
+    it('should find 10 employees in desc order', async function () {
+        const limit = 10;
+        const page = 1;
+        const employeesDesc = await service.findAll(limit,page,DatabaseOrder.DESC)
+        expect(employeesDesc).toHaveLength(10)
     });
 
     it('should delete one employee',async function () {
