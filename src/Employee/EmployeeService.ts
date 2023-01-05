@@ -5,6 +5,7 @@ import {PostgresErrorCodes} from "../common/database/PostgresErrorCodes.js";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {DatabaseError} from "pg";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
+import {ServerException} from "../common/exceptions/ServerException.js";
 
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
@@ -36,7 +37,9 @@ export class EmployeeService {
             return this.dataToEmployeeModel(data)
         }
         catch (e) {
-            throw e
+            if (e instanceof ResourceNotFoundException)
+                throw e
+            throw new ServerException()
         }
     }
 
@@ -50,7 +53,9 @@ export class EmployeeService {
                 throw new ResourceNotFoundException("employee",id)
             return true
         } catch (e) {
-            throw e
+            if (e instanceof ResourceNotFoundException)
+                throw e
+            throw new ServerException()
         }
     }
 
