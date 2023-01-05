@@ -52,7 +52,7 @@ export class EmployeeService {
             const result = await pgClient.query(
                 `SELECT * FROM "Employee" ORDER BY id ${queryOrder} LIMIT $1 OFFSET $2`,
                 [limit,offset])
-            return result.rows;
+            return this.dataArrayToEmployeeArray(result.rows)
         }catch (e) {
             throw new ServerException()
         }
@@ -107,5 +107,9 @@ export class EmployeeService {
             new Date(data.createdAt),
             new Date(data.updatedAt)
         )
+    }
+
+    private dataArrayToEmployeeArray(dataArray:any[]):EmployeeModel[]{
+        return dataArray.map(this.dataToEmployeeModel)
     }
 }
