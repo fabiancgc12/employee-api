@@ -25,7 +25,7 @@ export class EmployeeService {
         }
     }
 
-    async getOneById(id:string):Promise<EmployeeModel> {
+    async findOneById(id:string):Promise<EmployeeModel> {
         try {
             const result = await pgClient.query(
                 'SELECT * FROM "Employee" WHERE id = $1',
