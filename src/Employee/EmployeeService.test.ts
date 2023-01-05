@@ -145,10 +145,18 @@ describe("Employee Service",() => {
         expect(employee.boss).toBe(newBoss.id)
     });
 
+    it('should throw error if trying to update iwt existing email',async function () {
+        const oldEmployee = await service.createOne(mockCreateEmployeeDto());
+        const employee = await service.createOne(mockCreateEmployeeDto());
+        const updateDto:UpdateEmployeeDto = {
+            email:oldEmployee.email
+        };
+        await expect(service.updateOne(employee.id,updateDto)).rejects.toThrow(UniqueConstraintException)
+    });
+
     it('should should throw error on update if employee does not exist', async function () {
         const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
         await expect(service.updateOne("100000000",updateDto)).rejects.toThrow(ResourceNotFoundException)
-
     });
 
     it('should delete one employee',async function () {

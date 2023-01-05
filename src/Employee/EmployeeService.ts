@@ -79,6 +79,12 @@ export class EmployeeService {
             const data = result.rows[0]
             return this.dataToEmployeeModel(data);
         } catch (e) {
+            if (e instanceof pg.DatabaseError){
+                if (e.code == PostgresErrorCodes.DuplicatePrimaryKey)
+                    throw new UniqueConstraintException("email")
+                else
+                    throw e
+            }
             if (e instanceof ResourceNotFoundException)
                 throw e
             throw new ServerException()
