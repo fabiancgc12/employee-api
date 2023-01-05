@@ -14,9 +14,9 @@ import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
         try {
-            const values = [employeeDto.firstName,employeeDto.lastName,employeeDto.email,employeeDto.dateOfBirth,new Date()]
+            const values = [employeeDto.firstName,employeeDto.lastName,employeeDto.email,employeeDto.role,employeeDto.dateOfBirth,new Date()]
             const result = await pgClient.query(
-                'INSERT INTO "Employee" ("firstName","lastName","email","dateOfBirth","updatedAt") VALUES ($1,$2,$3,$4,$5) RETURNING *',
+                'INSERT INTO "Employee" ("firstName","lastName","email","role","dateOfBirth","updatedAt") VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
                 values)
             const data = result.rows[0]
             return this.dataToEmployeeModel(data)
@@ -66,13 +66,14 @@ export class EmployeeService {
             dto.firstName = dto.firstName ?? employee.firstName;
             dto.lastName = dto.lastName ?? employee.lastName;
             dto.email = dto.email ?? employee.email;
+            dto.role = dto.role ?? employee.role;
             dto.dateOfBirth = dto.dateOfBirth ?? employee.dateOfBirth;
             const result = await pgClient.query(
                 `UPDATE "Employee" SET "firstName" = $2, "lastName" = $3, 
-                      "email" = $4, "dateOfBirth" = $5, "updatedAt" = $6
+                      "email" = $4, "dateOfBirth" = $5, "updatedAt" = $6, "role" = $7
                       WHERE id = $1
                       RETURNING *`,
-                [id,dto.firstName,dto.lastName,dto.email,dto.dateOfBirth, new Date()]
+                [id,dto.firstName,dto.lastName,dto.email,dto.dateOfBirth, new Date(),dto.role]
             )
             const data = result.rows[0]
             return this.dataToEmployeeModel(data);
@@ -104,6 +105,7 @@ export class EmployeeService {
             data.id,
             data.firstName,
             data.lastName,
+            data.role,
             data.email,
             new Date(data.dateOfBirth),
             new Date(data.createdAt),
