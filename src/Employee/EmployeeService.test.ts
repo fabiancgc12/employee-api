@@ -57,4 +57,15 @@ describe("Employee Service",() => {
         await expect(service.getOneById('1000000000')).rejects.toThrow(ResourceNotFoundException)
 
     });
+
+    it('should delete one employee',async function () {
+        const dto = mockCreateEmployeeDto();
+        const employee = await service.createOne(dto)
+        await expect(service.deleteOneById(employee.id)).resolves.toEqual(true)
+        await expect(service.getOneById(employee.id)).rejects.toThrow(ResourceNotFoundException)
+    });
+
+    it('should throw error on delete if id does not exist', async function () {
+        await expect(service.deleteOneById('1000000000')).rejects.toThrow(ResourceNotFoundException)
+    });
 })

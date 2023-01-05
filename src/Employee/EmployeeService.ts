@@ -40,6 +40,20 @@ export class EmployeeService {
         }
     }
 
+    async deleteOneById(id:string):Promise<boolean>{
+        try {
+            const result = await pgClient.query(
+                'DELETE FROM "Employee" WHERE id = $1',
+                [id]
+            );
+            if (result.rowCount == 0)
+                throw new ResourceNotFoundException("employee",id)
+            return true
+        } catch (e) {
+            throw e
+        }
+    }
+
     private dataToEmployeeModel(data:any):EmployeeModel{
         return new EmployeeModel(
             data.id,
