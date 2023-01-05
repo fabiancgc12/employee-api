@@ -3,11 +3,13 @@ import {EmployeeModel} from "./model/EmployeeModel.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {PostgresErrorCodes} from "../common/database/PostgresErrorCodes.js";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
-import {DatabaseError} from "pg";
+import pg from "pg";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {ServerException} from "../common/exceptions/ServerException.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
+
+
 
 export class EmployeeService {
     async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
@@ -20,7 +22,7 @@ export class EmployeeService {
             return this.dataToEmployeeModel(data)
         }
         catch (e) {
-            if (e instanceof DatabaseError && e.code == PostgresErrorCodes.DuplicatePrimaryKey){
+            if (e instanceof pg.DatabaseError && e.code == PostgresErrorCodes.DuplicatePrimaryKey){
                 throw new UniqueConstraintException("email")
             }
             throw e

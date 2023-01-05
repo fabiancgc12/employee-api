@@ -7,7 +7,6 @@ import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundEx
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 
-
 function mockCreateEmployeeDto(
     options: Partial<CreateEmployeeDto> = {},
 ): CreateEmployeeDto {
@@ -21,10 +20,13 @@ function mockCreateEmployeeDto(
 describe("Employee Service",() => {
     let service:EmployeeService;
     beforeAll(async () => {
-        await pgClient.connect()
     })
     beforeEach(() => {
         service = new EmployeeService();
+    })
+
+    afterAll(async () => {
+        await pgClient.end()
     })
 
     it('should create one employee', async function () {

@@ -31,10 +31,10 @@ const server = http.createServer(app);
 
 server.listen(port, async () => {
   try {
-    await pgClient.connect()
-    console.log("connected to database")
+    await testConnection()
     console.log(`server started on port: ${port}`)
   } catch (e) {
+    await pgClient.end()
     console.error(e)
   }
 });
@@ -65,7 +65,9 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+async function onError(error) {
+  await pgClient.end()
+  console.log('pool has ended')
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -99,4 +101,16 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr?.port;
   debug('Listening on ' + bind);
+}
+
+async function testConnection() {
+  try {
+    const client = await pgClient.connect(); // try to connect
+    console.log("conected to database")
+    client.release(); // success, release connection;
+  } catch (e) {
+    console.error("There was an issue connecting to the database")
+    throw e
+  }
+
 }
