@@ -1,23 +1,10 @@
 import {EmployeeService} from "./EmployeeService.js";
-import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
-import {faker} from "@faker-js/faker";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
-
-function mockCreateEmployeeDto(
-    options: Partial<CreateEmployeeDto> = {},
-): CreateEmployeeDto {
-    return new CreateEmployeeDto(
-        options.firstName ?? faker.name.firstName(),
-        options.lastName ?? faker.name.lastName(),
-            options.email ?? faker.internet.email(),
-        options.role ?? faker.name.jobTitle(),
-        options.boss ?? undefined,
-        options.dateOfBirth ?? faker.date.birthdate()
-)}
+import {mockCreateEmployeeDto} from "../common/utils/mockCreateEmployeeDto.js";
 
 describe("Employee Service",() => {
     let service:EmployeeService;
