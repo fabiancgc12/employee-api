@@ -43,6 +43,18 @@ export class EmployeeService {
         }
     }
 
+    async findAll(limit:number,page:number){
+        try {
+            const offset = (page - 1)*limit
+            const result = await pgClient.query(
+                'SELECT * FROM "Employee" LIMIT $1 OFFSET $2',
+                [limit,offset])
+            return result.rows;
+        }catch (e) {
+            throw new ServerException()
+        }
+    }
+
     async deleteOneById(id:string):Promise<boolean>{
         try {
             const result = await pgClient.query(

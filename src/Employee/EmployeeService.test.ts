@@ -55,7 +55,13 @@ describe("Employee Service",() => {
 
     it('should throw error when employee id does not exist', async function () {
         await expect(service.getOneById('1000000000')).rejects.toThrow(ResourceNotFoundException)
+    });
 
+    it('should get all employees', async function () {
+        const limit = 10;
+        const page = 1;
+        const employees = await service.findAll(limit,page)
+        expect(employees).toHaveLength(10)
     });
 
     it('should delete one employee',async function () {
