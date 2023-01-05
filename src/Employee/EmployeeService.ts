@@ -103,9 +103,9 @@ export class EmployeeService {
             data.firstName,
             data.lastName,
             data.email,
-            data.dateOfBirth,
-            data.createdAt,
-            data.updatedAt
+            new Date(data.dateOfBirth),
+            new Date(data.createdAt),
+            new Date(data.updatedAt)
         )
     }
 }

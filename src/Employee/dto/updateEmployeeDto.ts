@@ -1,5 +1,3 @@
-import {CreateEmployeeDto} from "./createEmployeeDto.js";
-
 export class UpdateEmployeeDto {
     firstName?:string;
 
