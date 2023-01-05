@@ -9,10 +9,8 @@ import {ServerException} from "../common/exceptions/ServerException.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 
-
-
 export class EmployeeService {
-    async createOne(employeeDto:CreateEmployeeDto):Promise<EmployeeModel> {
+    createOne = async (employeeDto:CreateEmployeeDto):Promise<EmployeeModel> => {
         try {
             const values = [employeeDto.firstName,employeeDto.lastName,employeeDto.email,employeeDto.role,employeeDto.boss,employeeDto.dateOfBirth,new Date()]
             const result = await pgClient.query(
@@ -29,7 +27,7 @@ export class EmployeeService {
         }
     }
 
-    async findOneById(id:string):Promise<EmployeeModel> {
+    findOneById = async (id:string):Promise<EmployeeModel> => {
         try {
             const result = await pgClient.query(
                 'SELECT * FROM "Employee" WHERE id = $1',
@@ -47,7 +45,7 @@ export class EmployeeService {
         }
     }
 
-    async findAll(limit:number,page:number,order = DatabaseOrder.ASC){
+    findAll = async (limit:number,page:number,order = DatabaseOrder.ASC) => {
         try {
             let queryOrder = order == DatabaseOrder.DESC ? DatabaseOrder.DESC : ""
             const offset = (page - 1)*limit
@@ -60,7 +58,7 @@ export class EmployeeService {
         }
     }
 
-    async updateOne(id:string,dto:UpdateEmployeeDto):Promise<EmployeeModel>{
+    updateOne = async (id:string,dto:UpdateEmployeeDto):Promise<EmployeeModel> => {
         try {
             const employee = await this.findOneById(id);
             dto.firstName = dto.firstName ?? employee.firstName;
@@ -91,7 +89,7 @@ export class EmployeeService {
         }
     }
 
-    async deleteOneById(id:string):Promise<boolean>{
+    deleteOneById = async (id:string):Promise<boolean> => {
         try {
             const result = await pgClient.query(
                 'DELETE FROM "Employee" WHERE id = $1',
@@ -107,7 +105,7 @@ export class EmployeeService {
         }
     }
 
-    private dataToEmployeeModel(data:any):EmployeeModel{
+    private dataToEmployeeModel = (data:any):EmployeeModel => {
         return new EmployeeModel(
             data.id,
             data.firstName,
@@ -121,7 +119,7 @@ export class EmployeeService {
         )
     }
 
-    private dataArrayToEmployeeArray(dataArray:any[]):EmployeeModel[]{
+    private dataArrayToEmployeeArray = (dataArray:any[]):EmployeeModel[] => {
         return dataArray.map(this.dataToEmployeeModel)
     }
 }

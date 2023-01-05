@@ -145,7 +145,7 @@ describe("Employee Service",() => {
         expect(employee.boss).toBe(newBoss.id)
     });
 
-    it('should throw error if trying to update iwt existing email',async function () {
+    it('should throw error if trying to update with existing email',async function () {
         const oldEmployee = await service.createOne(mockCreateEmployeeDto());
         const employee = await service.createOne(mockCreateEmployeeDto());
         const updateDto:UpdateEmployeeDto = {
