@@ -2,11 +2,31 @@ import request from "supertest";
 import app from "../app.js";
 import {mockCreateEmployeeDto} from "../common/utils/mockCreateEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
+import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 
 describe("Employee controller",() => {
 
     afterAll(async () => {
         await pgClient.end()
+    })
+
+    describe("GET USERS/{id},", () => {
+        it('should get one employee', async function () {
+            const dto = mockCreateEmployeeDto();
+            const {body:employee} = await request(app).post("/users").send(dto);
+            return request(app)
+                .get(`/users/${employee.id}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(employee)
+        });
+
+        it('should throw error when employee id does not exist', async function () {
+            return request(app)
+                .get(`/users/100000000`)
+                .expect(404)
+        });
+
     })
 
     describe('POST/USERS', function () {
