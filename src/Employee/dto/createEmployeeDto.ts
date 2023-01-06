@@ -1,13 +1,34 @@
+import {IsDateString, IsEmail, IsNotEmpty, IsOptional, IsString,MinLength} from "class-validator";
+
 export class CreateEmployeeDto{
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(3)
     firstName:string;
 
+
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(3)
     lastName:string;
 
+
+    @IsNotEmpty()
+    @IsEmail()
     email:string;
 
+
+    @IsNotEmpty()
+    @IsString()
     role:string;
+
+    @IsString()
+    @IsOptional()
     boss?:string;
 
+
+    @IsNotEmpty()
+    @IsDateString()
     dateOfBirth:Date;
 
     constructor(firstName: string, lastName: string, email: string,role:string, boss:string|undefined,dateOfBirth: Date) {

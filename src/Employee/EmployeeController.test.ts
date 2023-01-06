@@ -5,10 +5,6 @@ import {pgClient} from "../common/database/pgClient.js";
 
 describe("Employee controller",() => {
 
-    beforeAll(() => {
-
-    })
-
     afterAll(async () => {
         await pgClient.end()
     })
@@ -73,6 +69,49 @@ describe("Employee controller",() => {
                 .expect(409)
         });
 
+        it('should throw error when dto if not sent', function () {
+            return request(app)
+                .post("/users")
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message.some(val => /firstName/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /lastName/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /email/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /role/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /dateOfBirth/.test(val))).toBe(true)
+                    // expect(res.body.message).toContain(["firstName must not be less than 3"])
+                })
+        });
+
+        it('should throw error when dto has incorrect data', function () {
+            const dto =mockCreateEmployeeDto ({
+                firstName:"aa",
+                email:"thisisnotanemail",
+                lastName:"bb",
+                // @ts-ignore
+                role:5,
+                // @ts-ignore
+                boss:5,
+                // @ts-ignore
+                dateOfBirth:"thisisnotadate"
+            })
+            return request(app)
+                .post("/users")
+                .send(dto)
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message.some(val => /firstName/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /lastName/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /email/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /role/.test(val))).toBe(true)
+                    expect(res.body.message.some(val => /dateOfBirth/.test(val))).toBe(true)
+                    // expect(res.body.message).toContain(["firstName must not be less than 3"])
+                })
+        });
     });
 
 
