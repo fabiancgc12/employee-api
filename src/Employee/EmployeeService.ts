@@ -108,7 +108,7 @@ export class EmployeeService {
         }
     }
 
-    private dataToEmployeeModel = (data:any):EmployeeModel => {
+    public dataToEmployeeModel = (data:any):EmployeeModel => {
         return new EmployeeModel(
             data.id,
             data.firstName,
@@ -122,7 +122,7 @@ export class EmployeeService {
         )
     }
 
-    private dataArrayToEmployeeArray = (dataArray:any[]):EmployeeModel[] => {
+    public dataArrayToEmployeeArray = (dataArray:any[]):EmployeeModel[] => {
         return dataArray.map(this.dataToEmployeeModel)
     }
 }

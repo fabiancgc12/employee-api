@@ -3,8 +3,13 @@ import app from "../app.js";
 import {mockCreateEmployeeDto} from "../common/utils/mockCreateEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
 import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
+import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
+import {EmployeeService} from "./EmployeeService.js";
+import {EmployeeModel} from "./model/EmployeeModel.js";
 
 describe("Employee controller",() => {
+
+    const employeeService = new EmployeeService()
 
     afterAll(async () => {
         await pgClient.end()
@@ -250,6 +255,112 @@ describe("Employee controller",() => {
                 })
         });
     });
+
+    describe('UPDATE USER',() => {
+        it('should update one employee firstname', async function () {
+            const createDto = mockCreateEmployeeDto();
+            const {body: employee} = await request(app).post("/users").send(createDto)
+            const updateDto:UpdateEmployeeDto = {
+                firstName: "dave"
+            }
+            //we are ignoring the updateat property because it will always be diferent
+            const {updatedAt,...rest} = employee
+            const patchedEmployee = {...rest,...updateDto}
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    expect(res.body).toMatchObject(patchedEmployee)
+                })
+            await request(app)
+                .get(`/users/${employee.id}`)
+                .then(res => {
+                    expect(res.body).toMatchObject(patchedEmployee)
+                })
+        });
+
+        it('should update one employee whole data', async function () {
+            const createDto = mockCreateEmployeeDto();
+            const {body: employee} = await request(app).post("/users").send(createDto)
+            const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
+            //we are ignoring the updateat property because it will always be different
+            const patchedEmployee = employeeService.dataToEmployeeModel({...employee,...updateDto})
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    const body:EmployeeModel = employeeService.dataToEmployeeModel(res.body)
+                    expect(body.id).toBe(patchedEmployee.id)
+                    expect(body.firstName).toBe(patchedEmployee.firstName)
+                    expect(body.lastName).toBe(patchedEmployee.lastName)
+                    expect(body.email).toBe(patchedEmployee.email)
+                    expect(body.role).toBe(patchedEmployee.role)
+                    expect(body.boss).toBe(patchedEmployee.boss)
+                    expect(body.dateOfBirth).toStrictEqual(patchedEmployee.dateOfBirth)
+                    expect(body.createdAt).toStrictEqual(patchedEmployee.createdAt)
+                })
+            await request(app)
+                .get(`/users/${employee.id}`)
+                .then(res => {
+                    const body:EmployeeModel = employeeService.dataToEmployeeModel(res.body)
+                    expect(body.id).toBe(patchedEmployee.id)
+                    expect(body.firstName).toBe(patchedEmployee.firstName)
+                    expect(body.lastName).toBe(patchedEmployee.lastName)
+                    expect(body.email).toBe(patchedEmployee.email)
+                    expect(body.role).toBe(patchedEmployee.role)
+                    expect(body.boss).toBe(patchedEmployee.boss)
+                    expect(body.dateOfBirth).toStrictEqual(patchedEmployee.dateOfBirth)
+                    expect(body.createdAt).toStrictEqual(patchedEmployee.createdAt)                })
+        });
+
+        it('should update one employee boss', async function () {
+            const createDto = mockCreateEmployeeDto();
+            const {body: boss} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const {body: employee} = await request(app).post("/users").send(createDto)
+            expect(employee.boss).toBe(undefined)
+            let updateDto:UpdateEmployeeDto = {
+                boss:boss.id
+            }
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .then(res => {
+                    expect(res.body.boss).toBe(boss.id)
+                })
+            const {body: newBoss} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            updateDto = {
+                boss:newBoss.id
+            }
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .then(res => {
+                    expect(res.body.boss).toBe(newBoss.id)
+                })
+        });
+
+        it('should throw error if trying to update with already on use email',async function () {
+            const {body: oldEmployee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const {body: employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const updateDto:UpdateEmployeeDto = {
+                email:oldEmployee.email
+            };
+            return request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .expect(409)
+        });
+
+        it('should should throw error on update if employee does not exist', async function () {
+            const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
+            return request(app)
+                .patch(`/users/1000000000`)
+                .send(updateDto)
+                .expect(404)
+        });
+    })
 
     describe('DELETE USERS', function () {
 

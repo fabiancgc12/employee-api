@@ -28,6 +28,7 @@ export class EmployeeController extends BaseController{
     this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
     this.router.get(this.baseRoute,useValidationMiddleware(FindAllEmployeesDto,"query"),this.findAll)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
+    this.router.patch(`${this.baseRoute}/:id`,this.updateOneById)
     this.router.delete(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.delete)
   }
 
@@ -65,6 +66,20 @@ export class EmployeeController extends BaseController{
       else
         next (new ServerException())
     }
+  }
+
+  updateOneById:RequestHandler = async (req,res,next) => {
+    try{
+      const dto = req.body
+      const id = req.params.id
+      const employee:EmployeeModel = await this.employeeService.updateOne(id,dto);
+      res.status(200).json(employee)
+    }catch (e) {
+      if  (e instanceof UniqueConstraintException || e instanceof ResourceNotFoundException)
+        next(e)
+      next(new ServerException())
+    }
+
   }
 
   delete:RequestHandler = async (req,res,next) => {
