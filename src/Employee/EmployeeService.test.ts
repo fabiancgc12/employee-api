@@ -59,6 +59,13 @@ describe("Employee Service",() => {
             });
             await expect(service.createOne(secondEmployeeDto)).rejects.toThrow(UniqueConstraintException)
         });
+
+        it('should should throw error if boss id does not exist',async function () {
+            const dto = mockCreateEmployeeDto({
+                boss:"100000000"
+            });
+            await expect(service.createOne(dto)).rejects.toThrow(ResourceNotFoundException)
+        });
     });
 
     describe('getOneById method', function () {
@@ -138,6 +145,8 @@ describe("Employee Service",() => {
             employee = await service.updateOne(employee.id,updateDto)
             expect(employee.boss).toBe(newBoss.id)
         });
+
+
 
         it('should return same employee if dto is empty', async function () {
             const createDto = mockCreateEmployeeDto();

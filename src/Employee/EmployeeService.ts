@@ -23,6 +23,8 @@ export class EmployeeService {
             if (e instanceof pg.DatabaseError){
                 if (e.code == PostgresErrorCodes.DuplicatePrimaryKey)
                     throw new UniqueConstraintException("email")
+                if (e.code == PostgresErrorCodes.ForeignKeyViolation)
+                    throw new ResourceNotFoundException("employee",employeeDto.boss)
                 else
                     throw e
             }

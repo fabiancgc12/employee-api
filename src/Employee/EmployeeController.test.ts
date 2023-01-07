@@ -268,6 +268,16 @@ describe("Employee controller",() => {
                     // expect(res.body.message).toContain(["firstName must not be less than 3"])
                 })
         });
+
+        it('should should throw error if boss id does not exist',async function () {
+            const dto = mockCreateEmployeeDto({
+                boss:"100000000"
+            });
+            return request(app)
+                .post("/users")
+                .send(dto)
+                .expect(404)
+        });
     });
 
     describe('UPDATE USER',() => {
@@ -355,6 +365,33 @@ describe("Employee controller",() => {
                 })
         });
 
+        it('should update one employee boss', async function () {
+            const createDto = mockCreateEmployeeDto();
+            const {body: boss} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const {body: employee} = await request(app).post("/users").send(createDto)
+            expect(employee.boss).toBe(undefined)
+            let updateDto:UpdateEmployeeDto = {
+                boss:boss.id
+            }
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .then(res => {
+                    expect(res.body.boss).toBe(boss.id)
+                })
+            const {body: newBoss} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            updateDto = {
+                boss:newBoss.id
+            }
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(updateDto)
+                .then(res => {
+                    expect(res.body.boss).toBe(newBoss.id)
+                })
+        });
+
+
         it('should throw error if trying to update with already on use email',async function () {
             const {body: oldEmployee} = await request(app).post("/users").send(mockCreateEmployeeDto())
             const {body: employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
@@ -375,7 +412,7 @@ describe("Employee controller",() => {
                 .expect(404)
         });
 
-        it('should throw error when param id is not number', async function () {
+        it('should throw error if boss id does not exist', async function () {
             return request(app)
                 .patch(`/users/thisisnotandid`)
                 .send(mockCreateEmployeeDto())

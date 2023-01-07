@@ -69,7 +69,7 @@ export class EmployeeController extends BaseController{
       const employee:EmployeeModel = await this.employeeService.createOne(dto);
       res.status(201).json(employee);
     }catch (e) {
-      if (e instanceof UniqueConstraintException)
+      if (e instanceof UniqueConstraintException || e instanceof ResourceNotFoundException)
         next(e)
       else
         next (new ServerException())
