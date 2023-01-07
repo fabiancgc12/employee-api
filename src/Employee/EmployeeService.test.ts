@@ -139,6 +139,25 @@ describe("Employee Service",() => {
             expect(employee.boss).toBe(newBoss.id)
         });
 
+        it('should return same employee if dto is empty', async function () {
+            const createDto = mockCreateEmployeeDto();
+            let employee = await service.createOne(createDto);
+            return  expect(service.updateOne(employee.id,{})).resolves.toEqual(employee);
+        });
+
+        it('should work if all the dto properties are undefined', async function () {
+            const createDto = mockCreateEmployeeDto();
+            let employee = await service.createOne(createDto);
+            const {updatedAt,...employeeWithoutUpdated} = employee
+            return  expect(service.updateOne(employee.id,{
+                firstName:undefined,
+                lastName:undefined,
+                email:undefined,
+                role:undefined,
+                dateOfBirth:undefined
+            })).resolves.toMatchObject(employeeWithoutUpdated)
+        });
+
         it('should throw error if trying to update with already on use email',async function () {
             const oldEmployee = await service.createOne(mockCreateEmployeeDto());
             const employee = await service.createOne(mockCreateEmployeeDto());

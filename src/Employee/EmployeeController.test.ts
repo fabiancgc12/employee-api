@@ -6,6 +6,7 @@ import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 import {EmployeeService} from "./EmployeeService.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
+import exp from "constants";
 
 describe("Employee controller",() => {
 
@@ -369,13 +370,33 @@ describe("Employee controller",() => {
         });
 
         //should work because all dto properties are optional
-        it('should work when no dto is sent', async function () {
+        it('should return same employee when no dto is sent', async function () {
             const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
             return request(app)
                 .patch(`/users/${employee.id}`)
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(employee)
+        });
+
+        it('should work if all the dto properties are undefined', async function () {
+            const createDto = mockCreateEmployeeDto();
+            const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const {updatedAt,...employeeWithoutUpdated} = employee
+            return request(app)
+                .patch(`/users/${employee.id}`)
+                .expect(200)
+                .send({
+                    firstName:undefined,
+                    lastName:undefined,
+                    email:undefined,
+                    role:undefined,
+                    dateOfBirth:undefined
+                })
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    expect(res.body).toMatchObject(employeeWithoutUpdated)
+                })
         });
 
         it('should throw error when dto has invalid data', async function () {
