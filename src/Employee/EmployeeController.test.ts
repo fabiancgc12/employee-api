@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../app.js";
 import {mockCreateEmployeeDto} from "../common/utils/mockCreateEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
+import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 
 describe("Employee controller",() => {
 
@@ -36,6 +37,45 @@ describe("Employee controller",() => {
             await request(app)
                 .get(`/users/-1`)
                 .expect(404)
+        });
+
+    })
+
+    describe('GET ALL USERS', () => {
+        it('should find all employees', async function () {
+            const limit = 10;
+            const page = 1;
+            return request(app)
+                .get(`/users/?page=${page}&limit=${limit}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.length).toBeLessThanOrEqual(10)
+                })
+        });
+
+        it('should find 0 employees', async function () {
+            const limit = 10;
+            const page = 10000000;
+            return request(app)
+                .get(`/users/?page=${page}&limit=${limit}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.length).toBeLessThanOrEqual(0)
+                })
+        });
+
+        it('should find 15 employees in desc order', async function () {
+            const limit = 15;
+            const page = 1;
+            return request(app)
+                .get(`/users/?page=${page}&limit=${limit}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.length).toBeLessThanOrEqual(15)
+                })
         });
 
     })
@@ -144,6 +184,5 @@ describe("Employee controller",() => {
                 })
         });
     });
-
 
 })

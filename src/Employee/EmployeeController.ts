@@ -8,6 +8,8 @@ import {ServerException} from "../common/exceptions/ServerException.js";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {EmployeeParamsDto} from "./dto/EmployeeParamsDto.js";
+import {plainToInstance} from "class-transformer";
+import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 
 export class EmployeeController extends BaseController{
   readonly baseRoute = "/users";
@@ -24,6 +26,7 @@ export class EmployeeController extends BaseController{
 
   private initializeRoutes = () => {
     this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
+    this.router.get(this.baseRoute,this.findAll)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
   }
 
@@ -40,6 +43,16 @@ export class EmployeeController extends BaseController{
     }
   }
 
+  findAll:RequestHandler = async (req,res,next) => {
+    try {
+      const query = req.query;
+      const employees:EmployeeModel[] = await this.employeeService.findAll(Number(query.limit),Number(query.page),query.order as DatabaseOrder)
+      res.status(200).json(employees)
+    } catch (e) {
+      next(new ServerException())
+    }
+
+  }
   create:RequestHandler = async (req,res,next) => {
     try {
       const dto = req.body
