@@ -9,8 +9,9 @@ import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintEx
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 import {EmployeeParamsDto} from "./dto/EmployeeParamsDto.js";
 import {plainToInstance} from "class-transformer";
-import {FindAllEmployeesDto} from "./dto/findAllEmployeesDto.js";
+import {FindAllEmployeesQueryDto} from "./dto/findAllEmployeesQueryDto.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
+import {FindAllEmployeesDto} from "./dto/findAllEmployeesDto.js";
 
 export class EmployeeController extends BaseController{
   readonly baseRoute = "/users";
@@ -27,7 +28,7 @@ export class EmployeeController extends BaseController{
 
   private initializeRoutes = () => {
     this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
-    this.router.get(this.baseRoute,useValidationMiddleware(FindAllEmployeesDto,"query"),this.findAll)
+    this.router.get(this.baseRoute,useValidationMiddleware(FindAllEmployeesQueryDto,"query"),this.findAll)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
     this.router.patch(
         `${this.baseRoute}/:id`,
@@ -53,9 +54,10 @@ export class EmployeeController extends BaseController{
 
   findAll:RequestHandler = async (req,res,next) => {
     try {
-      const query = plainToInstance(FindAllEmployeesDto,req.query);
+      const query = plainToInstance(FindAllEmployeesQueryDto,req.query);
       const employees:EmployeeModel[] = await this.employeeService.findAll(query.limit,query.page,query.order)
-      res.status(200).json(employees)
+      const resp = new FindAllEmployeesDto(employees,query)
+      res.status(200).json(resp)
     } catch (e) {
       next(new ServerException())
     }

@@ -6,7 +6,6 @@ import {DatabaseOrder} from "../common/database/DatabaseOrder.js";
 import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 import {EmployeeService} from "./EmployeeService.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
-import exp from "constants";
 
 describe("Employee controller",() => {
 
@@ -56,7 +55,10 @@ describe("Employee controller",() => {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
-                    expect(res.body.length).toBeLessThanOrEqual(10)
+                    expect(res.body.data.length).toBeLessThanOrEqual(10)
+                    expect(res.body.meta.limit).toBe(limit)
+                    expect(res.body.meta.page).toBe(page)
+                    expect(res.body.meta.order).toBe(DatabaseOrder.DESC)
                 })
         });
 
@@ -68,20 +70,26 @@ describe("Employee controller",() => {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
-                    expect(res.body.length).toBeLessThanOrEqual(0)
+                    expect(res.body.data.length).toBeLessThanOrEqual(0);
+                    expect(res.body.meta.limit).toBe(limit)
+                    expect(res.body.meta.page).toBe(page)
+                    expect(res.body.meta.order).toBe(DatabaseOrder.DESC)
                 })
         });
 
-        it('should find 15 employees in desc order', async function () {
+        it('should find 15 employees in asc order', async function () {
             const limit = 15;
-            const page = 1;
+            const page = 2;
             const order = DatabaseOrder.ASC
             return request(app)
                 .get(`/users/?page=${page}&limit=${limit}&order=${order}`)
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
-                    expect(res.body.length).toBeLessThanOrEqual(15)
+                    expect(res.body.data.length).toBeLessThanOrEqual(15);
+                    expect(res.body.meta.limit).toBe(limit)
+                    expect(res.body.meta.page).toBe(page)
+                    expect(res.body.meta.order).toBe(order)
                 })
         });
 
@@ -91,7 +99,10 @@ describe("Employee controller",() => {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
-                    expect(res.body.length).toBeLessThanOrEqual(10)
+                    expect(res.body.data.length).toBeLessThanOrEqual(10)
+                    expect(res.body.meta.limit).toBe(10)
+                    expect(res.body.meta.page).toBe(1)
+                    expect(res.body.meta.order).toBe(DatabaseOrder.DESC)
                 })
         });
 
@@ -102,7 +113,9 @@ describe("Employee controller",() => {
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
-                    expect(res.body.length).toBeLessThanOrEqual(10)
+                    expect(res.body.data.length).toBeLessThanOrEqual(10)
+                    expect(res.body.meta.limit).toBe(10)
+                    expect(res.body.meta.page).toBe(page)
                 })
         });
 
@@ -380,7 +393,6 @@ describe("Employee controller",() => {
         });
 
         it('should work if all the dto properties are undefined', async function () {
-            const createDto = mockCreateEmployeeDto();
             const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
             const {updatedAt,...employeeWithoutUpdated} = employee
             return request(app)
