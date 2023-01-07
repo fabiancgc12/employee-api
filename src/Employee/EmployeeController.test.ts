@@ -69,12 +69,78 @@ describe("Employee controller",() => {
         it('should find 15 employees in desc order', async function () {
             const limit = 15;
             const page = 1;
+            const order = DatabaseOrder.ASC
             return request(app)
-                .get(`/users/?page=${page}&limit=${limit}`)
+                .get(`/users/?page=${page}&limit=${limit}&order=${order}`)
                 .expect(200)
                 .expect('Content-Type', /json/)
                 .expect(res => {
                     expect(res.body.length).toBeLessThanOrEqual(15)
+                })
+        });
+
+        it('should find 10 employees if no query is sent', async function () {
+            return request(app)
+                .get(`/users/?`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.length).toBeLessThanOrEqual(10)
+                })
+        });
+
+        it('should find 10 employees if only page is sent', async function () {
+            const page = 3;
+            return request(app)
+                .get(`/users/?page=${page}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.length).toBeLessThanOrEqual(10)
+                })
+        });
+
+        it('should throw error if query is invalid', async function () {
+            const page = "thispageiswrong"
+            const limit = "thislimitisivalid"
+            const order = "notDescNorAsc"
+            return request(app)
+                .get(`/users/?page=${page}&limit=${limit}&order=${order}`)
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message).toContain("page must not be less than 1")
+                    expect(res.body.message).toContain("page must be a number conforming to the specified constraints")
+                    expect(res.body.message).toContain("limit must not be greater than 25")
+                    expect(res.body.message).toContain("limit must not be less than 1")
+                    expect(res.body.message).toContain("order must be one of the following values: ASC, DESC")
+                })
+        });
+
+        it('should throw error if page or limit are negatives', async function () {
+            const page = -1
+            const limit = -1
+            return request(app)
+                .get(`/users/?page=${page}&limit=${limit}`)
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message).toContain("page must not be less than 1")
+                    expect(res.body.message).toContain("limit must not be less than 1")
+                })
+        });
+
+        it('should throw error if limit is over 25', async function () {
+            const limit = 30
+            return request(app)
+                .get(`/users/?limit=${limit}`)
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .expect(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message).toContain("limit must not be greater than 25")
                 })
         });
 

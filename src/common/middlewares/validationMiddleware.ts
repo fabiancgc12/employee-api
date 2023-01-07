@@ -1,9 +1,10 @@
+import "reflect-metadata"
 import {Request, RequestHandler, Response} from "express";
 import {validate } from "class-validator";
 import {plainToInstance} from "class-transformer";
 import {ValidationException} from "../exceptions/ValidationException.js";
 
-type toInspectType = "body" | "params";
+type toInspectType = "body" | "params" | "query";
 
 export function useValidationMiddleware(dtoClass:any,toInspect:toInspectType = "body"):RequestHandler {
     return async (req: Request, res: Response,next) => {
