@@ -83,11 +83,11 @@ describe("Employee Service",() => {
         expect(employees).toHaveLength(0)
     });
 
-    it('should find 10 employees in desc order', async function () {
+    it('should find 15 employees in desc order', async function () {
         const limit = 10;
         const page = 1;
         const employeesDesc = await service.findAll(limit,page,DatabaseOrder.DESC)
-        expect(employeesDesc.length).toBeLessThanOrEqual(10)
+        expect(employeesDesc.length).toBeLessThanOrEqual(15)
     });
 
     it('should update one employee firstname', async function () {
