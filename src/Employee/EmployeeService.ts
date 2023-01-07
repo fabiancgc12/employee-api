@@ -20,8 +20,11 @@ export class EmployeeService {
             return this.dataToEmployeeModel(data)
         }
         catch (e) {
-            if (e instanceof pg.DatabaseError && e.code == PostgresErrorCodes.DuplicatePrimaryKey){
-                throw new UniqueConstraintException("email")
+            if (e instanceof pg.DatabaseError){
+                if (e.code == PostgresErrorCodes.DuplicatePrimaryKey)
+                    throw new UniqueConstraintException("email")
+                else
+                    throw e
             }
             throw e
         }
@@ -39,7 +42,7 @@ export class EmployeeService {
             return this.dataToEmployeeModel(data)
         }
         catch (e) {
-            if (e instanceof ResourceNotFoundException)
+            if (e instanceof ResourceNotFoundException || e instanceof pg.DatabaseError)
                 throw e
             throw new ServerException()
         }

@@ -4,6 +4,10 @@ import {EmployeeService} from "./EmployeeService.js";
 import {useValidationMiddleware} from "../common/middlewares/validationMiddleware.js";
 import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
+import pg from 'pg';
+import {ServerException} from "../common/exceptions/ServerException.js";
+import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
+import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 
 export class EmployeeController extends BaseController{
   readonly baseRoute = "/users";
@@ -29,9 +33,11 @@ export class EmployeeController extends BaseController{
       const employee:EmployeeModel = await this.employeeService.findOneById(id)
       res.status(200).json(employee);
     } catch (e){
-      next(e)
+      if (e instanceof ResourceNotFoundException)
+        next(e)
+      else
+        next (new ServerException())
     }
-
   }
 
   create:RequestHandler = async (req,res,next) => {
@@ -40,7 +46,10 @@ export class EmployeeController extends BaseController{
       const employee:EmployeeModel = await this.employeeService.createOne(dto);
       res.status(201).json(employee);
     }catch (e) {
-      next(e)
+      if (e instanceof UniqueConstraintException)
+        next(e)
+      else
+        next (new ServerException())
     }
   }
 }
