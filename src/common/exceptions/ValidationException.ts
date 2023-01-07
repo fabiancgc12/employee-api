@@ -3,11 +3,10 @@ import {ValidationError} from "class-validator";
 
 export class ValidationException extends ApiException{
     constructor(errors:ValidationError[]) {
-        const message = errors.map(error => {
+        const message:string[] = [];
+        errors.forEach(error => {
             if (error.constraints)
-                return Object.values(error.constraints).join(",")
-            else
-                return ""
+                message.push(...Object.values(error.constraints))
         })
         super(400,message);
     }
