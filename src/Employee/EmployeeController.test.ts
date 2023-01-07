@@ -2,7 +2,6 @@ import request from "supertest";
 import app from "../app.js";
 import {mockCreateEmployeeDto} from "../common/utils/mockCreateEmployeeDto.js";
 import {pgClient} from "../common/database/pgClient.js";
-import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
 
 describe("Employee controller",() => {
 
@@ -24,6 +23,18 @@ describe("Employee controller",() => {
         it('should throw error when employee id does not exist', async function () {
             return request(app)
                 .get(`/users/100000000`)
+                .expect(404)
+        });
+
+        it('should throw error when param id is not number', async function () {
+            await request(app)
+                .get(`/users/thisisnotandid`)
+                .expect(400)
+            await request(app)
+                .get(`/users/0`)
+                .expect(404)
+            await request(app)
+                .get(`/users/-1`)
                 .expect(404)
         });
 

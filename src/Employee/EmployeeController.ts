@@ -4,10 +4,10 @@ import {EmployeeService} from "./EmployeeService.js";
 import {useValidationMiddleware} from "../common/middlewares/validationMiddleware.js";
 import {CreateEmployeeDto} from "./dto/createEmployeeDto.js";
 import {EmployeeModel} from "./model/EmployeeModel.js";
-import pg from 'pg';
 import {ServerException} from "../common/exceptions/ServerException.js";
 import {UniqueConstraintException} from "../common/exceptions/UniqueConstraintException.js";
 import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundException.js";
+import {EmployeeParamsDto} from "./dto/EmployeeParamsDto.js";
 
 export class EmployeeController extends BaseController{
   readonly baseRoute = "/users";
@@ -23,7 +23,7 @@ export class EmployeeController extends BaseController{
   }
 
   private initializeRoutes = () => {
-    this.router.get(`${this.baseRoute}/:id`,this.findOneById)
+    this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
   }
 
