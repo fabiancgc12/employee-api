@@ -354,7 +354,7 @@ describe("Employee controller",() => {
                 .expect(409)
         });
 
-        it('should should throw error on update if employee does not exist', async function () {
+        it('should throw error on update if employee does not exist', async function () {
             const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
             return request(app)
                 .patch(`/users/1000000000`)

@@ -167,7 +167,7 @@ describe("Employee Service",() => {
             await expect(service.updateOne(employee.id,updateDto)).rejects.toThrow(UniqueConstraintException)
         });
 
-        it('should should throw error on update if employee does not exist', async function () {
+        it('should throw error on update if employee does not exist', async function () {
             const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
             await expect(service.updateOne("100000000",updateDto)).rejects.toThrow(ResourceNotFoundException)
         });
