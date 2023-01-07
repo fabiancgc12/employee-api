@@ -1,4 +1,4 @@
-import {IsDateString, IsEmail, IsNotEmpty, IsOptional, IsString,MinLength} from "class-validator";
+import {IsDateString, IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsString, MinLength} from "class-validator";
 
 export class CreateEmployeeDto{
     @IsNotEmpty()
@@ -22,7 +22,7 @@ export class CreateEmployeeDto{
     @IsString()
     role:string;
 
-    @IsString()
+    @IsNumberString()
     @IsOptional()
     boss?:string;
 
