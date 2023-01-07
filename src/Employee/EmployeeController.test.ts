@@ -146,7 +146,7 @@ describe("Employee controller",() => {
 
     })
 
-    describe('POST/USERS', function () {
+    describe('POST USERS', function () {
 
         it('should create one employee without boss', async function () {
             const dto = mockCreateEmployeeDto()
@@ -249,6 +249,40 @@ describe("Employee controller",() => {
                     // expect(res.body.message).toContain(["firstName must not be less than 3"])
                 })
         });
+    });
+
+    describe('DELETE USERS', function () {
+
+        it('should delete one employee',async function () {
+            const dto = mockCreateEmployeeDto();
+            const {body: employee} = await request(app).post("/users").send(dto);
+            await request(app)
+                .delete(`/users/${employee.id}`)
+                .expect(200)
+            // we try to delete again to be sure it now throws a ResourceNotFoundException
+            await request(app)
+                .delete(`/users/${employee.id}`)
+                .expect(404)
+        });
+
+        it('should throw error on delete if id does not exist', async function () {
+            await  request(app)
+                .delete(`/users/1000000000`)
+                .expect(404)
+            await request(app)
+                .delete(`/users/0`)
+                .expect(404)
+            await request(app)
+                .get(`/users/-1`)
+                .expect(404)
+        });
+
+        it('should throw error when param id is not number', async function () {
+            return request(app)
+                .delete(`/users/thisisnotandid`)
+                .expect(400)
+        });
+
     });
 
 })

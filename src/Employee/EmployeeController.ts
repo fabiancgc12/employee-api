@@ -28,6 +28,7 @@ export class EmployeeController extends BaseController{
     this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
     this.router.get(this.baseRoute,useValidationMiddleware(FindAllEmployeesDto,"query"),this.findAll)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
+    this.router.delete(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.delete)
   }
 
   findOneById:RequestHandler = async (req, res, next) => {
@@ -63,6 +64,19 @@ export class EmployeeController extends BaseController{
         next(e)
       else
         next (new ServerException())
+    }
+  }
+
+  delete:RequestHandler = async (req,res,next) => {
+    try {
+      const id = req.params.id;
+      await this.employeeService.deleteOneById(id)
+      res.status(200).send()
+    } catch (e) {
+      if (e instanceof ResourceNotFoundException)
+        next(e)
+      else
+        next(new ServerException())
     }
   }
 }
