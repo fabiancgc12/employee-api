@@ -22,8 +22,14 @@ describe("Employee controller",() => {
         });
 
         it('should throw error when employee id does not exist', async function () {
-            return request(app)
+            await request(app)
                 .get(`/users/100000000`)
+                .expect(404)
+            await request(app)
+                .get(`/users/0`)
+                .expect(404)
+            await request(app)
+                .get(`/users/-1`)
                 .expect(404)
         });
 
@@ -31,12 +37,6 @@ describe("Employee controller",() => {
             await request(app)
                 .get(`/users/thisisnotandid`)
                 .expect(400)
-            await request(app)
-                .get(`/users/0`)
-                .expect(404)
-            await request(app)
-                .get(`/users/-1`)
-                .expect(404)
         });
 
     })
