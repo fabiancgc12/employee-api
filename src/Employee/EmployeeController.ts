@@ -10,6 +10,7 @@ import {ResourceNotFoundException} from "../common/exceptions/ResourceNotFoundEx
 import {EmployeeParamsDto} from "./dto/EmployeeParamsDto.js";
 import {plainToInstance} from "class-transformer";
 import {FindAllEmployeesDto} from "./dto/findAllEmployeesDto.js";
+import {UpdateEmployeeDto} from "./dto/updateEmployeeDto.js";
 
 export class EmployeeController extends BaseController{
   readonly baseRoute = "/users";
@@ -28,7 +29,12 @@ export class EmployeeController extends BaseController{
     this.router.get(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.findOneById)
     this.router.get(this.baseRoute,useValidationMiddleware(FindAllEmployeesDto,"query"),this.findAll)
     this.router.post(this.baseRoute,useValidationMiddleware(CreateEmployeeDto),this.create)
-    this.router.patch(`${this.baseRoute}/:id`,this.updateOneById)
+    this.router.patch(
+        `${this.baseRoute}/:id`,
+        useValidationMiddleware(EmployeeParamsDto,"params"),
+        useValidationMiddleware(UpdateEmployeeDto,"body"),
+        this.updateOneById
+    )
     this.router.delete(`${this.baseRoute}/:id`,useValidationMiddleware(EmployeeParamsDto,"params"),this.delete)
   }
 

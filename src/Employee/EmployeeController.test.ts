@@ -211,7 +211,7 @@ describe("Employee controller",() => {
                 .expect(409)
         });
 
-        it('should throw error when dto if not sent', function () {
+        it('should throw error when dto is not sent', function () {
             return request(app)
                 .post("/users")
                 .expect(400)
@@ -359,6 +359,63 @@ describe("Employee controller",() => {
                 .patch(`/users/1000000000`)
                 .send(updateDto)
                 .expect(404)
+        });
+
+        it('should throw error when param id is not number', async function () {
+            return request(app)
+                .patch(`/users/thisisnotandid`)
+                .send(mockCreateEmployeeDto())
+                .expect(400)
+        });
+
+        //should work because all dto properties are optional
+        it('should work when no dto is sent', async function () {
+            const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            return request(app)
+                .patch(`/users/${employee.id}`)
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(employee)
+        });
+
+        it('should throw error when dto has invalid data', async function () {
+            const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            const dto = mockCreateEmployeeDto ({
+                firstName:"aa",
+                email:"thisisnotanemail",
+                lastName:"bb",
+                // @ts-ignore
+                role:5,
+                // @ts-ignore
+                boss:5,
+                // @ts-ignore
+                dateOfBirth:"thisisnotadate"
+            })
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send(dto)
+                .expect(400)
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message).toContain("firstName must be longer than or equal to 3 characters")
+                    expect(res.body.message).toContain("lastName must be longer than or equal to 3 characters")
+                    expect(res.body.message).toContain("role must be a string")
+                    expect(res.body.message).toContain("boss must be a number string")
+                    expect(res.body.message).toContain("dateOfBirth must be a valid ISO 8601 date string")
+                })
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send({
+                    firstName:10,
+                    lastName:7
+                })
+                .expect(400)
+                .then(res => {
+                    expect(res.body.message).toBeInstanceOf(Array)
+                    expect(res.body.message).toContain("firstName must be a string")
+                    expect(res.body.message).toContain("lastName must be a string")
+                })
         });
     })
 

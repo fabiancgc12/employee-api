@@ -64,6 +64,9 @@ export class EmployeeService {
     updateOne = async (id:string,dto:UpdateEmployeeDto):Promise<EmployeeModel> => {
         try {
             const employee = await this.findOneById(id);
+            //if dto is empty then just return the employee and not make any update
+            if (Object.keys(dto).length === 0)
+                return employee
             dto.firstName = dto.firstName ?? employee.firstName;
             dto.lastName = dto.lastName ?? employee.lastName;
             dto.email = dto.email ?? employee.email;
