@@ -1,8 +1,8 @@
-import { Type } from "class-transformer";
 import {IsEnum, IsNumber, Max, Min} from "class-validator";
-import {DatabaseOrder} from "../../common/database/DatabaseOrder.js";
+import {Type} from "class-transformer";
+import {DatabaseOrder} from "../database/DatabaseOrder.js";
 
-export class FindAllEmployeesQueryDto {
+export class FindAllQueryDto {
     @IsNumber()
     @Min(1)
     @Type(() => Number)
