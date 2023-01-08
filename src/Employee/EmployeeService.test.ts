@@ -185,7 +185,18 @@ describe("Employee Service",() => {
             const updateDto:UpdateEmployeeDto = {
                 boss: "10000000"
             }
-            return  expect(service.updateOne(employee.id,updateDto)).rejects.toThrow(ResourceNotFoundException)
+            await expect(service.updateOne(employee.id,updateDto)).rejects.toThrow(ResourceNotFoundException)
+        });
+
+        it('should update and set the boss as undefined',async function () {
+            const createDto = mockCreateEmployeeDto();
+            const employee = await service.createOne(createDto);
+            const updateDto:UpdateEmployeeDto = {
+                boss: undefined
+            }
+            const updated = await service.updateOne(employee.id,updateDto)
+            expect(updated.boss).toBe(undefined)
+            expect((await service.findOneById(employee.id)).boss).toBe(undefined)
         });
     })
 

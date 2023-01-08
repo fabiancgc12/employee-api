@@ -496,6 +496,23 @@ describe("Employee controller",() => {
                     expect(res.body.message).toContain("lastName must be a string")
                 })
         });
+
+        it('should update the employee and set the boss undefined', async function () {
+            const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send({
+                    boss:undefined
+                })
+                .then(res => {
+                    expect(res.body.boss).toBe(undefined)
+                })
+            return request(app)
+                .get(`/users/${employee.id}`)
+                .then(res => {
+                    expect(res.body.boss).toBe(undefined)
+                })
+        });
     })
 
     describe('DELETE USERS', function () {
