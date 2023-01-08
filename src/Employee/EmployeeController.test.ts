@@ -270,10 +270,24 @@ describe("Employee controller",() => {
         });
 
         it('should should throw error if boss id does not exist',async function () {
-            const dto = mockCreateEmployeeDto({
+            let dto = mockCreateEmployeeDto({
                 boss:"100000000"
             });
-            return request(app)
+            await request(app)
+                .post("/users")
+                .send(dto)
+                .expect(404)
+            dto = mockCreateEmployeeDto({
+                boss:"0"
+            });
+            await request(app)
+                .post("/users")
+                .send(dto)
+                .expect(404)
+            dto = mockCreateEmployeeDto({
+                boss:"-1"
+            });
+            await request(app)
                 .post("/users")
                 .send(dto)
                 .expect(404)
@@ -420,10 +434,22 @@ describe("Employee controller",() => {
 
         it('should throw error if boss id does not exist', async function () {
             const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
-            return request(app)
+            await request(app)
                 .patch(`/users/${employee.id}`)
                 .send({
                     boss:"100000000"
+                })
+                .expect(404)
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send({
+                    boss:"0"
+                })
+                .expect(404)
+            await request(app)
+                .patch(`/users/${employee.id}`)
+                .send({
+                    boss:"-1"
                 })
                 .expect(404)
         });
