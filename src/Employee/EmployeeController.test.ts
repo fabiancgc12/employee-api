@@ -391,7 +391,6 @@ describe("Employee controller",() => {
                 })
         });
 
-
         it('should throw error if trying to update with already on use email',async function () {
             const {body: oldEmployee} = await request(app).post("/users").send(mockCreateEmployeeDto())
             const {body: employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
@@ -412,11 +411,21 @@ describe("Employee controller",() => {
                 .expect(404)
         });
 
-        it('should throw error if boss id does not exist', async function () {
+        it('should throw error if employee id does not exist', async function () {
             return request(app)
                 .patch(`/users/thisisnotandid`)
                 .send(mockCreateEmployeeDto())
                 .expect(400)
+        });
+
+        it('should throw error if boss id does not exist', async function () {
+            const {body:employee} = await request(app).post("/users").send(mockCreateEmployeeDto())
+            return request(app)
+                .patch(`/users/${employee.id}`)
+                .send({
+                    boss:"100000000"
+                })
+                .expect(404)
         });
 
         //should work because all dto properties are optional

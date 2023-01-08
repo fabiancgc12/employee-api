@@ -146,8 +146,6 @@ describe("Employee Service",() => {
             expect(employee.boss).toBe(newBoss.id)
         });
 
-
-
         it('should return same employee if dto is empty', async function () {
             const createDto = mockCreateEmployeeDto();
             let employee = await service.createOne(createDto);
@@ -179,6 +177,15 @@ describe("Employee Service",() => {
         it('should throw error on update if employee does not exist', async function () {
             const updateDto:UpdateEmployeeDto = mockCreateEmployeeDto()
             await expect(service.updateOne("100000000",updateDto)).rejects.toThrow(ResourceNotFoundException)
+        });
+
+        it('should should throw error if boss id does not exist',async function () {
+            const createDto = mockCreateEmployeeDto();
+            const employee = await service.createOne(createDto);
+            const updateDto:UpdateEmployeeDto = {
+                boss: "10000000"
+            }
+            return  expect(service.updateOne(employee.id,updateDto)).rejects.toThrow(ResourceNotFoundException)
         });
     })
 
